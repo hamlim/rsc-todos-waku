@@ -4,18 +4,18 @@
 import type { PathsForPages, GetConfigResponse } from 'waku/router';
 
 // prettier-ignore
-import type { getConfig as Index_getConfig } from "./pages/index";
+import type { getConfig as File_Handle_getConfig } from './pages/[handle]';
 // prettier-ignore
-import type { getConfig as Mdx_getConfig } from "./pages/mdx";
+import type { getConfig as File_Index_getConfig } from './pages/index';
 
 // prettier-ignore
 type Page =
-  | { path: "/_root"; render: "dynamic" }
-  | ({ path: "/" } & GetConfigResponse<typeof Index_getConfig>)
-  | ({ path: "/mdx" } & GetConfigResponse<typeof Mdx_getConfig>);
+| ({ path: '/[handle]' } & GetConfigResponse<typeof File_Handle_getConfig>)
+| { path: '/_root'; render: 'dynamic' }
+| ({ path: '/' } & GetConfigResponse<typeof File_Index_getConfig>);
 
 // prettier-ignore
-declare module "waku/router" {
+declare module 'waku/router' {
   interface RouteConfig {
     paths: PathsForPages<Page>;
   }

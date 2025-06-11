@@ -1,5 +1,5 @@
 {
-  "name": "waku-template",
+  "name": "rsc-todos-waku",
   "compatibility_date": "2025-04-16",
   "compatibility_flags": ["nodejs_compat"],
   "main": "./dist/worker/serve-cloudflare.js",
@@ -8,5 +8,12 @@
     "binding": "ASSETS",
     "html_handling": "drop-trailing-slash",
     "not_found_handling": "404-page"
-  }
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "rsc-todos-waku",
+      "database_id": "f8be2cb4-835b-4b74-a6bd-79a9243f7cf8"
+    }
+  ]
 }
