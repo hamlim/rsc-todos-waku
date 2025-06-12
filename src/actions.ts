@@ -1,23 +1,24 @@
 "use server";
 
+import { unstable_rerenderRoute } from "waku/router/server";
 import { getHonoContext } from "./utils/get-hono-context";
 
-export async function createTodo(formData: FormData) {
+export async function createTodo(formData: FormData): Promise<void> {
   let handle = formData.get("handle");
   let title = formData.get("title");
 
   if (!handle || !title) {
-    return { error: "Missing handle or title" };
+    throw new Error("Missing handle or title");
   }
 
   let ctx = getHonoContext();
   if (!ctx) {
-    return { error: "Not in a Hono context" };
+    throw new Error("Not in a Hono context");
   }
 
   let db = ctx.env.DB;
   if (!db) {
-    return { error: "DB not found" };
+    throw new Error("DB not found");
   }
 
   let result = await db
@@ -25,37 +26,38 @@ export async function createTodo(formData: FormData) {
     .bind(handle, title)
     .run();
   if (result.error) {
-    return { error: result.error };
+    throw new Error(result.error);
   }
-
-  return { success: true };
+  unstable_rerenderRoute(`/${handle}`);
 }
 
-export async function checkTodo(formData: FormData) {
+export async function checkTodo(formData: FormData): Promise<void> {
   let handle = formData.get("handle");
   let title = formData.get("title");
+  let completed = formData.get("completed");
 
   if (!handle || !title) {
-    return { error: "Missing handle or title" };
+    throw new Error("Missing handle or title");
   }
 
   let ctx = getHonoContext();
   if (!ctx) {
-    return { error: "Not in a Hono context" };
+    throw new Error("Not in a Hono context");
   }
 
   let db = ctx.env.DB;
   if (!db) {
-    return { error: "DB not found" };
+    throw new Error("DB not found");
   }
 
   let result = await db
-    .prepare("UPDATE todos SET completed = TRUE WHERE handle = ? AND title = ?")
+    .prepare(
+      `UPDATE todos SET completed = ${completed === "true" ? "false" : "true"} WHERE handle = ? AND title = ?`,
+    )
     .bind(handle, title)
     .run();
   if (result.error) {
-    return { error: result.error };
+    throw new Error(result.error);
   }
-
-  return { success: true };
+  unstable_rerenderRoute(`/${handle}`);
 }
