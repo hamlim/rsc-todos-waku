@@ -34,10 +34,11 @@ export async function createTodo(formData: FormData): Promise<void> {
 export async function checkTodo(formData: FormData): Promise<void> {
   let handle = formData.get("handle");
   let title = formData.get("title");
+  let id = formData.get("id");
   let completed = formData.get("completed");
 
-  if (!handle || !title) {
-    throw new Error("Missing handle or title");
+  if (!handle || !title || !id) {
+    throw new Error("Missing handle or title or id");
   }
 
   let ctx = getHonoContext();
@@ -52,9 +53,9 @@ export async function checkTodo(formData: FormData): Promise<void> {
 
   let result = await db
     .prepare(
-      `UPDATE todos SET completed = ${completed === "true" ? "false" : "true"} WHERE handle = ? AND title = ?`,
+      `UPDATE todos SET completed = ${completed === "true" ? "false" : "true"} WHERE id = ?`,
     )
-    .bind(handle, title)
+    .bind(id)
     .run();
   if (result.error) {
     throw new Error(result.error);

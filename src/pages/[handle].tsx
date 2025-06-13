@@ -1,3 +1,4 @@
+import { CheckIcon, XIcon } from "lucide-react";
 import { Suspense } from "react";
 import { checkTodo, createTodo } from "../actions";
 import { getHonoContext } from "../utils/get-hono-context";
@@ -24,30 +25,47 @@ async function Todos({ handle }: { handle: string }) {
 
   return (
     <ul>
-      {result.results.map(
-        (todo: { id: number; title: string; completed: boolean }) => (
+      {(
+        result.results as unknown as Array<{
+          id: number;
+          title: string;
+          completed: boolean;
+        }>
+      )
+        .toSorted((a, b) => (a.completed ? 1 : -1))
+        .map((todo: { id: number; title: string; completed: boolean }) => (
           <li key={todo.id}>
-            <form action={checkTodo}>
+            <form action={checkTodo} className="flex items-center gap-2">
               <input type="hidden" name="handle" value={handle} />
               <input type="hidden" name="title" value={todo.title} />
+              <input type="hidden" name="id" value={todo.id} />
               <input
                 type="hidden"
                 name="completed"
                 value={todo.completed ? "true" : "false"}
               />
-              <button type="submit">{todo.completed ? "✅" : "❌"}</button>
+              <button
+                type="submit"
+                className="p-1 flex items-center content-center rounded-md bg-slate-50 border border-slate-200"
+              >
+                {todo.completed ? (
+                  <CheckIcon className="text-green-400" size={20} />
+                ) : (
+                  <XIcon size={20} className="text-red-400" />
+                )}
+              </button>
+              {todo.completed ? <s>{todo.title}</s> : todo.title}
             </form>
-            {todo.title}
           </li>
-        ),
-      )}
+        ))}
     </ul>
   );
 }
 
-export default function UserTodos({ handle }: { handle: string }) {
+export default async function HandlePage({ handle }: { handle: string }) {
   return (
     <main className="mx-auto max-w-prose p-4">
+      <title>{`${handle} Todos`}</title>
       <h1 className="text-center text-2xl font-bold">{handle} Todos:</h1>
       <form action={createTodo}>
         <input type="hidden" name="handle" value={handle} />
